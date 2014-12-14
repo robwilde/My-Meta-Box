@@ -1,12 +1,11 @@
 <?php
-/*
-Plugin Name: Demo MetaBox
-Plugin URI: http://en.bainternet.info
-Description: My Meta Box Class usage demo
-Version: 3.1.1
-Author: Bainternet, Ohad Raz
-Author URI: http://en.bainternet.info
-*/
+/**
+Plugin Name: Nu Diag Members
+Version: 0.1
+Description: Nutrition Diagnostics Members plugin for controlling posts, pages and products
+Author: Huxburyquinn
+Author URI: http://www.huxburyquinn.com.au/
+ */
 
 //include the main class file
 require_once("meta-box-class/my-meta-box-class.php");
