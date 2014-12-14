@@ -666,7 +666,6 @@ class AT_Meta_Box {
    * @access public
    */
   public function show_field_checkbox( $field, $meta ) {
-    
 
     $this->show_field_begin($field, $meta);
     echo "<input type='checkbox' ".( isset($field['style'])? "style='{$field['style']}' " : '' )." class='rw-checkbox".( isset($field['class'])? ' ' . $field['class'] : '' )."' name='{$field['id']}' id='{$field['id']}'" . checked(!empty($meta), true, false) . " />";
