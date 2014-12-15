@@ -27,7 +27,11 @@
 #wpcontent select.at-select { height: 30px !important; padding: 5px; display: block; min-width: 200px; }
 .at-field .desc-field { color: #AAA; font-style: italic; margin: 5px 0 0 3px !important; font-size: 13px; }
 .at-field .wp_themeSkin table.mceLayout{ border: 1px solid #DFDFDF; }
-#post-body .at-field .wp_themeSkin .mceStatusbar a.mceResize{ top: -25px; } 
+#post-body .at-field .wp_themeSkin .mceStatusbar a.mceResize{ top: -25px; }
+
+/*.at-radio{float: left;}*/
+/*.at-radio-label{float: left;}*/
+/*.at-field {clear: both;}*/
 
 /* =Uploaded Images
 ----------------------------------------------- */
