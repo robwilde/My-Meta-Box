@@ -257,7 +257,7 @@ function nudiag_content_filter( $content ) {
 			$truncated = truncate( $content );
 
 			$message = '<div class="ndm-signup-message">';
-			$message .= '<p>Sorry You need to be ' . ucfirst( nudiag_content_role( get_the_ID() ) ) . ' register to access this content</p>';
+			$message .= '<p>Sorry You need to be register to access this content</p>';
 			$message .= '<a href="'. get_site_url() .'/wp-login.php">Login in</a></div>';
 
 			return $truncated . $message;
