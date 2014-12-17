@@ -230,6 +230,20 @@ function adjust_pdf_links( $content ){
 }
 
 /**
+ * @param $wprewrite
+ *
+ * @return mixed
+ */
+function fb_generate_rewrite_rules( $wprewrite ) {
+	$upload = wp_upload_dir();
+	$path = str_replace( site_url( '/' ), '', $upload[ 'baseurl' ] );
+	$wprewrite -> non_wp_rules = array( $path . '/(.*)' => 'index.php?file=$1' );
+	return $wprewrite;
+//	pretty_printr($wprewrite);
+}
+add_filter( 'generate_rewrite_rules', 'fb_generate_rewrite_rules' );
+
+/**
  * @param $content
  *
  * @return mixed restricted content view
@@ -244,7 +258,7 @@ function nudiag_content_filter( $content ) {
 
 			$message = '<div class="ndm-signup-message">';
 			$message .= '<p>Sorry You need to be ' . ucfirst( nudiag_content_role( get_the_ID() ) ) . ' register to access this content</p>';
-			$message .= '<a href=" '. get_site_url() .'"/wp-login.php">Login in</a></div>';
+			$message .= '<a href="'. get_site_url() .'/wp-login.php">Login in</a></div>';
 
 			return $truncated . $message;
 
