@@ -12,6 +12,12 @@ Author URI: http://huxburyquinn.com.au/
 require_once( "meta-box-class/nd-meta-box-class.php" );
 require_once( "meta-box-class/simple_html_dom.php");
 
+if ( ! is_admin() ){
+
+	// CSS for U display message box and icons
+	wp_enqueue_style( 'meta-box-ui',  plugins_url('meta-box-class/css/meta-box-ui.css', __FILE__) );
+}
+
 if ( is_admin() ) {
 	/*
 	   * prefix of meta keys, optional
@@ -88,10 +94,6 @@ if ( is_admin() ) {
  */
 function nudiag_content_role( $the_post_id ) {
 
-//	$the_post_id = ( $the_post_id = ''
-//		? get_the_ID( )
-//		: $the_post_id );
-
 	$post_meta          = get_post_meta( $the_post_id );
 	$conditional_fields = unserialize( $post_meta[ 'conditinal_fields' ][ 0 ] );
 
@@ -135,8 +137,7 @@ function nudiag_access_level( $role ) {
 			return 2;
 			break;
 		case 'practitioner':
-			return 3;
-			break;
+			return 3;			break;
 		case 'administrator':
 			return 4;
 			break;
@@ -146,16 +147,24 @@ function nudiag_access_level( $role ) {
 }
 
 /**
- * @param $string
- * @param int $length
- * @param string $append
+ * @param $content
+ * @param array $args
  *
  * @return array|string
  */
-function truncate( $content, $excerpt_length = 30, $include_image = FALSE, $append = "&hellip;" ) {
+function truncate( $content, $args = array()) {
+
+//	shortcode_atts($atts, )
+
+	$excerpt_length = 30;
+	$include_image = FALSE;
+	$append = "&hellip;";
+
+	if( isset ($args )) extract($args);
+
 	$content = trim( $content );
 
-	if ($include_image == FALSE )  $content = remove_html_tags('img', $content);
+	if ($include_image == FALSE )  $content = remove_html_tags(array('img', 'a'), $content);
 
 	$words = explode( ' ', $content, $excerpt_length + 1 );
 
@@ -171,18 +180,20 @@ function truncate( $content, $excerpt_length = 30, $include_image = FALSE, $appe
 
 /**
  * Finding tag in HTML
- * @param $tag
+ * @param array $tags
  * @param $content
  *
  * @return array of clean content
  */
-function remove_html_tags ($tag, $content  ){
+function remove_html_tags ($tags, $content  ){
 
 	$html = str_get_html($content);
 
-	// Find all images and remove tag
-	foreach($html->find($tag) as $element){
-		$element->outertext = '';
+	foreach ( $tags as $tag ){
+		// Find all unwanted tags and remove from display
+		foreach($html->find($tag) as $element){
+			$element->outertext = '';
+		}
 	}
 
 	$return = $html->save();
@@ -195,6 +206,30 @@ function remove_html_tags ($tag, $content  ){
 }
 
 /**
+ * Adding the required CSS class to the PDF links only
+ * @param $content
+ *
+ * @return string
+ */
+function adjust_pdf_links( $content ){
+
+	$html = str_get_html( $content );
+	$pdf_file = '';
+
+	foreach ($html->find('a[href$=pdf]') as $pdf_file ){
+		$pdf_file->class = 'nudiag_attachment nudiag_pdf';
+	}
+
+	$updated_html = $html->save();
+	// clean up memory
+	$html->clear();
+	unset($html);
+
+	return $updated_html;
+//	pretty_printr($updated_html);
+}
+
+/**
  * @param $content
  *
  * @return mixed restricted content view
@@ -204,21 +239,19 @@ function nudiag_content_filter( $content ) {
 	$content_role = nudiag_content_role( get_the_ID() );
 	$user_role    = nudiag_user_role();
 
-//	if ( is_single() || is_home() ) {
-
 		if ( $content_role !== 'public' && nudiag_access_level( $user_role ) < nudiag_access_level( $content_role ) ) {
 			$truncated = truncate( $content );
 
 			$message = '<div class="ndm-signup-message">';
 			$message .= '<p>Sorry You need to be ' . ucfirst( nudiag_content_role( get_the_ID() ) ) . ' register to access this content</p>';
-			$message .= '<a href="http://wpplugins.dev/wp-login.php">Login in</a></div>';
+			$message .= '<a href=" '. get_site_url() .'"/wp-login.php">Login in</a></div>';
 
 			return $truncated . $message;
 
 		}
-//	}
 
-	return $content;
+	return adjust_pdf_links($content);
+//	pretty_printr($content);
 }
 
 add_filter( 'the_content', 'nudiag_content_filter' );

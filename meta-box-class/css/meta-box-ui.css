@@ -1,0 +1,21 @@
+
+.ndm-signup-message {
+    background-color: #A1D6F8;
+    padding: 10px 10px;
+    border-radius: 3px;
+}
+
+.nudiag_attachment {
+    display: inline-block;
+    height: auto;
+    min-height: 48px;
+    line-height: 48px;
+    background-position: left top;
+    background-attachment: scroll;
+    background-repeat: no-repeat;
+    padding-left: 76px !important;
+}
+
+.nudiag_pdf {
+    background-image: url("../images/pdf-icon-48x48.png");
+}
