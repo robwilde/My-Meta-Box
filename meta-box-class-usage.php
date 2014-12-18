@@ -94,7 +94,7 @@ if ( is_admin() ) {
  */
 function nudiag_content_role( $the_post_id ) {
 
-	$post_meta          = get_post_meta( $the_post_id );
+	$post_meta = get_post_meta( $the_post_id );
 	$conditional_fields = unserialize( $post_meta[ 'conditinal_fields' ][ 0 ] );
 
 	if ( isset ( $conditional_fields[ 'enabled' ] ) ) {
@@ -138,9 +138,9 @@ function nudiag_access_level( $role ) {
 			break;
 		case 'practitioner':
 			return 3;			break;
-		case 'administrator':
-			return 4;
-			break;
+//		case 'administrator':
+//			return 4;
+//			break;
 		default:
 			return 0;
 	}
@@ -156,24 +156,30 @@ function truncate( $content, $args = array()) {
 
 //	shortcode_atts($atts, )
 
+	$excerpt = TRUE;
 	$excerpt_length = 30;
 	$include_image = FALSE;
 	$append = "&hellip;";
 
 	if( isset ($args )) extract($args);
 
+	$excerpt_content = ($excerpt === TRUE) ? strstr($content, '<!--more-->', TRUE) : NULL ;
+//	pretty_printr($excerpt_content);
+
 	$content = trim( $content );
 
 	if ($include_image == FALSE )  $content = remove_html_tags(array('img', 'a'), $content);
 
-	$words = explode( ' ', $content, $excerpt_length + 1 );
-
-	if ( count( $words ) > $excerpt_length ) :
-		array_pop( $words );
-		array_push( $words, '...' );
-		$content = implode( ' ', $words );
-	endif;
-	$content = '<p>' . $content . '</p>';
+	if ($excerpt_content ){
+		$content = $excerpt_content;
+	} else {
+		$words = explode( ' ', $content, $excerpt_length + 1 );
+		if ( count( $words ) > $excerpt_length ) :
+			array_pop( $words );
+			array_push( $words, '...' );
+			$content = implode( ' ', $words );
+		endif;
+	}
 
 	return $content;
 }
@@ -197,13 +203,13 @@ function remove_html_tags ($tags, $content  ){
 	}
 
 	$return = $html->save();
-
 	// clean up memory
 	$html->clear();
 	unset($html);
 
 	return $return;
 }
+
 
 /**
  * Adding the required CSS class to the PDF links only
@@ -230,20 +236,6 @@ function adjust_pdf_links( $content ){
 }
 
 /**
- * @param $wprewrite
- *
- * @return mixed
- */
-function fb_generate_rewrite_rules( $wprewrite ) {
-	$upload = wp_upload_dir();
-	$path = str_replace( site_url( '/' ), '', $upload[ 'baseurl' ] );
-	$wprewrite -> non_wp_rules = array( $path . '/(.*)' => 'index.php?file=$1' );
-	return $wprewrite;
-//	pretty_printr($wprewrite);
-}
-add_filter( 'generate_rewrite_rules', 'fb_generate_rewrite_rules' );
-
-/**
  * @param $content
  *
  * @return mixed restricted content view
@@ -254,19 +246,18 @@ function nudiag_content_filter( $content ) {
 	$user_role    = nudiag_user_role();
 
 		if ( $content_role !== 'public' && nudiag_access_level( $user_role ) < nudiag_access_level( $content_role ) ) {
-			$truncated = truncate( $content );
+			$truncated = truncate( $content, array('include_image' => TRUE) );
 
 			$message = '<div class="ndm-signup-message">';
 			$message .= '<p>Sorry You need to be register to access this content</p>';
 			$message .= '<a href="'. get_site_url() .'/wp-login.php">Login in</a></div>';
 
-			return $truncated . $message;
+			return $truncated . '<br>' . $message;
 
 		}
 
-	return adjust_pdf_links($content);
+//	return adjust_pdf_links($content);
+	return $content;
 //	pretty_printr($content);
 }
-
-add_filter( 'the_content', 'nudiag_content_filter' );
-
+add_filter( 'the_content', 'nudiag_content_filter');
