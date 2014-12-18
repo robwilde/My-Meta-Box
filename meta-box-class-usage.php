@@ -250,7 +250,7 @@ function nudiag_content_filter( $content ) {
 
 			$message = '<div class="ndm-signup-message">';
 			$message .= '<p>Sorry You need to be register to access this content</p>';
-			$message .= '<a href="'. get_site_url() .'/wp-login.php">Login in</a></div>';
+			$message .= '<a href="'. get_site_url() .'/my-account/">Login in</a></div>';
 
 			return $truncated . '<br>' . $message;
 
